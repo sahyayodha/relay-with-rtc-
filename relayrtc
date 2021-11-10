@@ -1,0 +1,49 @@
+#include <OneWire.h> 
+#include <Wire.h>
+#include <DallasTemperature.h>
+#include <LiquidCrystal_I2C.h>
+#include <RTClib.h>
+#include <Servo.h>
+
+RTC_DS3231 rtc;
+DateTime Date;
+const int RELAY_PIN = 1;
+String waktuLampu[2] = {"08:00", "16:00"};
+char daysOfTheWeek[7][12] = {"Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"};
+
+void setup() {
+  Serial.begin(9600);
+  rtc.begin();
+  rtc.adjust(DateTime(2021, 11, 9, 11, 01, 00)); //settime rtcny
+ if (rtc.lostPower()) 
+  {
+// rtc.adjust(DateTime(F(DATE), F(TIME)));
+  }
+// rtc.adjust(DateTime(F(DATE), F(TIME)));
+  // INISIALISASI RTC (REAL TIME CLOCK)
+
+  Serial.println("SETUP RTC SELESAI");
+}
+
+void loop(){
+    
+  Date = rtc.now(); 
+  String rtcTime = String(Date.hour()) + ":" + String(Date.minute());
+  String rtcTanggal = String(Date.day()) + "/" + String(Date.month()) + "/" + String(Date.year());
+  
+  Serial.print("HARI : ");
+  Serial.println(daysOfTheWeek[Date.dayOfTheWeek()]);
+  Serial.print("TANGGAL : ");
+  Serial.println(rtcTanggal);
+  Serial.print("JAM : ");
+  Serial.println(rtcTime); 
+
+  if(rtcTime == waktuLampu[0]) {
+    digitalWrite(RELAY_PIN, HIGH);
+    Serial.println("LAMPU AKAN MENYALA DARI JAM 08:00 HINGGA JAM 16:00");
+    delay(21600000);
+  } else if(rtcTime == waktuLampu[1]) {
+    digitalWrite(RELAY_PIN, LOW);
+    Serial.println("LAMPU AKAN MATI");
+  }
+}
